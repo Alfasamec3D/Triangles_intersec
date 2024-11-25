@@ -276,6 +276,14 @@ bool compare(const Triangle triangle1, const Triangle triangle2)
 	{
 		return (compare(triangle1.segm(), triangle2.segm()));
 	}
+	if ((triangle1.actual() == 0) && (triangle2.actual() == 2))
+	{
+		return (compare(triangle1.m_apexes[0], triangle2));
+	}
+	if ((triangle1.actual() == 2) && (triangle2.actual() == 0))
+	{
+		return (compare(triangle2.m_apexes[0], triangle1));
+	}
 	if ((triangle1.actual() == 1) && (triangle2.actual() == 2))
 	{
 		return (compare(triangle1.segm(), triangle2));
@@ -286,8 +294,8 @@ bool compare(const Triangle triangle1, const Triangle triangle2)
 	}
 	if ((triangle1.actual() == 2) && (triangle2.actual() == 2))
 	{
-		std::vector<int>d1(3);
-		std::vector<int>d2(3);
+		std::vector<int> d1(3);
+		std::vector<int> d2(3);
 		for (int i = 0; i < 3; i++)
 		{
 			d1[i] = eps_sgn(scalprod({ triangle2.m_apexes[0],triangle1.m_apexes[i] }, triangle2.norm()));
