@@ -397,10 +397,6 @@ bool compare(const Triangle triangle1, const Triangle triangle2)
 			}
 		else if ((k1 == 2) && (k2 == 2))
 		{
-			std::cout<<t11.x()<<' '<<t11.y()<<' '<<t11.z()<<std::endl;
-			std::cout<<t12.x()<<' '<<t12.y()<<' '<<t12.z()<<std::endl;
-			std::cout<<t21.x()<<' '<<t21.y()<<' '<<t21.z()<<std::endl;
-			std::cout<<t22.x()<<' '<<t22.y()<<' '<<t22.z()<<std::endl;
 			return compare(Segment{ t11, t12 }, Segment{ t21 , t22 });
 		}
 	}
