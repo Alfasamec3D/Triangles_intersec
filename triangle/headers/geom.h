@@ -6,8 +6,8 @@
 #include<cassert>
 #include <iomanip>
 
-template <typename T> int eps_sgn(T val);
 template <typename T> bool eps_eq(T val1, T val2);
+template <typename T> int eps_sgn(T val);
 
 class Point
 {
