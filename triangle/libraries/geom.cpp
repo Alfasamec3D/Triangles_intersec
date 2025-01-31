@@ -6,13 +6,6 @@
 #include<cmath>
 #include <iomanip>
 
-template <typename T> bool eps_eq(T val1, T val2)
-{
-	T eps{0.000001};
-	return std::abs(val2-val1)<eps;
-}
-
-
 template <typename T> int eps_sgn(T val) 
 {
 	if (eps_eq(val,T(0)))
