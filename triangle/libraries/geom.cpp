@@ -329,22 +329,21 @@ void final()
 	{
 		std::cin >> mass[i];
 	}
-	std::vector<int> res;
+	std::set <int> res;
 	for (int i = 0; i < N; i++)
 	{
-		for (int j = 0; j < N; j++)
+		for (int j = i+1; j < std::min(N, 10); j++)
 		{
-			if (j != i)
+			
+			if (compare(mass[i], mass[j]))
 			{
-				if (compare(mass[i], mass[j]))
-				{
-					res.push_back(i);
-					break;
-				}
+				res.insert(i);
+				res.insert(j);
 			}
+			
 		}
 
 	}
-	for (std::vector<int>::iterator it = res.begin(); it != res.end(); ++it)
-		std::cout << ' ' << *(it)+1<<std::endl;
+	for (int k: res) {
+		std::cout << ' ' << k<<std::endl;}
 }
