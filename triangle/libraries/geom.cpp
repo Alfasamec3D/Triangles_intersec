@@ -5,6 +5,8 @@
 #include <algorithm>
 #include<cmath>
 #include <set>
+#include <boost/geometry.hpp>
+#include <boost/geometry/index/rtree.hpp>
 
 template <typename T> int eps_sgn(T val) 
 {
@@ -93,7 +95,18 @@ Segment Triangle::segm() const
 			}
 	}
 }
-
+Point Triangle::minCorner() const
+{
+	return {std::min(std::min(m_apexes[0].x(), m_apexes[1].x()), m_apexes[2].x()),
+		    std::min(std::min(m_apexes[0].y(), m_apexes[1].y()), m_apexes[2].y()),
+		    std::min(std::min(m_apexes[0].z(), m_apexes[1].z()), m_apexes[2].z())};
+};
+Point Triangle::maxCorner() const
+{
+	return {std::max(std::max(m_apexes[0].x(), m_apexes[1].x()), m_apexes[2].x()),
+		    std::max(std::max(m_apexes[0].y(), m_apexes[1].y()), m_apexes[2].y()),
+		    std::max(std::max(m_apexes[0].z(), m_apexes[1].z()), m_apexes[2].z())};
+};
 Point intsec(const Segment segment, const Triangle triangle)
 {
 	Vector temp = segment.m_edges[0]  + segment.dir() * scalprod({ segment.m_edges[0],triangle.m_apexes[0] }, triangle.norm())*(1/scalprod(segment.dir(), triangle.norm()));
@@ -320,30 +333,52 @@ bool compare(const Triangle triangle1, const Triangle triangle2)
 		}
 	}
 }
+
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
+
+
 void final()
 {
 	int N;
-	std::cin >> N;
-	std::vector<Triangle> mass(N);
-	for (int i = 0; i < N; i++)
-	{
-		std::cin >> mass[i];
-	}
-	std::set <int> res;
-	for (int i = 0; i < N; i++)
-	{
-		for (int j = i+1; j < std::min(N, 10); j++)
-		{
-			
-			if (compare(mass[i], mass[j]))
-			{
-				res.insert(i);
-				res.insert(j);
-			}
-			
-		}
-
-	}
-	for (int k: res) {
-		std::cout << ' ' << k<<std::endl;}
+    std::cin >> N;
+    std::vector<Triangle> triangles(N);
+    std::vector<AABB> boundingBoxes(N);
+    std::set<int> intersectingTriangles;
+    
+    using Box = bg::model::box<bg::model::point<double, 3, bg::cs::cartesian>>;
+    using Value = std::pair<Box, int>;
+    bgi::rtree<Value, bgi::quadratic<16>> rtree;
+    
+    for (int i = 0; i < N; ++i) {
+        std::cin >> triangles[i];
+        boundingBoxes[i] = {triangles[i].minCorner(), triangles[i].maxCorner()};
+        Box box(
+            bg::model::point<double, 3, bg::cs::cartesian>(boundingBoxes[i].minCorner.x(), boundingBoxes[i].minCorner.y(), boundingBoxes[i].minCorner.z()),
+            bg::model::point<double, 3, bg::cs::cartesian>(boundingBoxes[i].maxCorner.x(), boundingBoxes[i].maxCorner.y(), boundingBoxes[i].maxCorner.z())
+        );
+        rtree.insert({box, i});
+    }
+    
+    for (int i = 0; i < N; ++i) {
+        Box queryBox(
+            bg::model::point<double, 3, bg::cs::cartesian>(boundingBoxes[i].minCorner.x(), boundingBoxes[i].minCorner.y(), boundingBoxes[i].minCorner.z()),
+            bg::model::point<double, 3, bg::cs::cartesian>(boundingBoxes[i].maxCorner.x(), boundingBoxes[i].maxCorner.y(), boundingBoxes[i].maxCorner.z())
+        );
+        
+        std::vector<Value> candidates;
+        rtree.query(bgi::intersects(queryBox), std::back_inserter(candidates));
+        
+        for (const auto& [box, j] : candidates) {
+            if (i != j && compare(triangles[i], triangles[j])) {
+                intersectingTriangles.insert(i);
+                intersectingTriangles.insert(j);
+            }
+        }
+    }
+    
+    for (int index : intersectingTriangles) {
+        std::cout << index <<std::endl;
+    }
 }
