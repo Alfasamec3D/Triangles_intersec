@@ -96,10 +96,17 @@ public:
 	}
 	int actual() const;
 	Segment segm() const;
+	Point minCorner() const;
+	Point maxCorner() const;
 	friend bool compare(const Triangle triangle1, const Triangle triangle2);
 	friend bool compare(const Segment segment, const Triangle triangle);
 	friend bool compare(const Point point, const Triangle triangle);
 	friend Point intsec(const Segment segment, const Triangle triangle);
+};
+
+
+struct AABB {
+    Point minCorner, maxCorner;
 };
 
 
